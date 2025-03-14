@@ -3,7 +3,7 @@ n8n Workflow: Web Scraping, Vector Database, and Document Processing
  Overview  
 This n8n workflow automates web scraping, vector database storage, document processing, and user interaction. It extracts news headlines from Hacker News, converts them into embeddings, stores them in Qdrant, and allows users to search for relevant articles. Additionally, it processes uploaded documents (PDF/DOCX), extracts insights, and retrieves relevant content based on user queries.  
 
-Since OpenAI's API was not used** due to billing constraints, we implemented local embedding models and open-source APIs to handle vector storage and summarization.  
+Since OpenAI's API was not used due to billing constraints, we implemented local embedding models and open-source APIs to handle vector storage and summarization.  
 
 Features  
 - Scrapes news headlines from Hacker News and extracts titles, URLs, and descriptions.  
@@ -63,7 +63,7 @@ User Queries
 
  Deployment Options  
  1️ Run Locally  
-bash
+
 n8n start
 
 2️ Deploy to Cloud Server (Optional)  
