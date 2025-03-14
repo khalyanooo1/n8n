@@ -1,0 +1,445 @@
+{
+    "name": "My workflow",
+    "nodes": [
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                0,
+                0
+            ],
+            "id": "5ccfdf4e-ef56-465f-9290-537d47db7d94",
+            "name": "When clicking \u2018Test workflow\u2019"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://vjxzyhdaseunrxrc63cgnw.c0.asia-southeast1.gcp.weaviate.cloud/v1/objects",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "={{$credentials.weaviateApi.apiKey}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{\n  \"class\": \"HackerNews\",\n  \"properties\": {\n    \"title\": \"Sample News\",\n    \"content\": \"This is a test news article.\"\n  },\n  \"vector\": [0.123, -0.456, 0.789, 0.321, -0.654, 0.987]\n}\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                720,
+                0
+            ],
+            "id": "1672cf91-a141-4512-a753-ad3f4b3089ea",
+            "name": "weavite DB"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://vjxzyhdaseunrxrc63cgnw.c0.asia-southeast1.gcp.weaviate.cloud/v1/objects",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "={{$credentials.weaviateApi.apiKey}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{\n  \"class\": \"HackerNews\",\n  \"properties\": {\n    \"title\": \"New Test News\",\n    \"content\": \"Automated insertion via n8n.\"\n  },\n  \"vector\": [0.321, -0.123, 0.654, -0.987, 0.789, 0.456]\n}\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1180,
+                0
+            ],
+            "id": "2eb8d310-3c71-4898-aac2-08abdd3eec99",
+            "name": "insert data"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://vjxzyhdaseunrxrc63cgnw.c0.asia-southeast1.gcp.weaviate.cloud/v1/graphql",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "={{$credentials.weaviateApi.apiKey}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{\n  \"query\": \"{ Get { HackerNews { title content } } }\"\n}\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1500,
+                0
+            ],
+            "id": "6e41c273-49d4-420f-a168-f609e3a8cbe6",
+            "name": "query Data"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://vjxzyhdaseunrxrc63cgnw.c0.asia-southeast1.gcp.weaviate.cloud/v1/graphql",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "name": "Authorization",
+                            "value": "={{$credentials.weaviateApi.apiKey}}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "{\n  \"query\": \"{ Get { Khalyan(where: { path: [\\\"title\\\"], operator: Like, valueText: \\\"*AI*\\\" }) { title url } } }\"\n}\n",
+                "options": {
+                    "query": "\n            {\n                Get {\n                    HackerNews(where: { title: { contains: \"AI\" } }) {\n                        title\n                        url\n                    }\n                }\n            }\n            "
+                },
+                "jsonParameters": true
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                1780,
+                0
+            ],
+            "id": "106a3483-b2c3-4111-8f1e-94d82b5170d9",
+            "name": "search"
+        },
+        {
+            "parameters": {
+                "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                220,
+                0
+            ],
+            "id": "297697e4-ff2d-4978-a161-ce2a4565f8bf",
+            "name": "fetch ID",
+            "retryOnFail": true,
+            "waitBetweenTries": 2000
+        },
+        {
+            "parameters": {
+                "url": "=https://hacker-news.firebaseio.com/v0/item/{{$json}}.json\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                400,
+                0
+            ],
+            "id": "6c014ae0-a73b-4f63-a8a1-31e71a03180c",
+            "name": "fetch URL"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "/upload-document",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                40,
+                220
+            ],
+            "id": "42b80c13-1fd5-4905-90b2-09700e2afc66",
+            "name": "upload Doc",
+            "webhookId": "3e55dd17-7eb0-4694-9c94-9cb2defb7592"
+        },
+        {
+            "parameters": {
+                "operation": "text",
+                "binaryPropertyName": "file",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.extractFromFile",
+            "typeVersion": 1,
+            "position": [
+                280,
+                220
+            ],
+            "id": "01a09983-edd8-4abe-90a3-78ea4cbe651d",
+            "name": "Extract from File"
+        },
+        {
+            "parameters": {
+                "language": "python",
+                "pythonCode": "import subprocess\n\n# Get extracted text from the previous node\nfile_text = input_data[\"data\"]  # Ensure \"data\" matches the Extract node output\n\n# Debugging: Print file text\nprint(\"Extracted text:\", file_text[:500])  # Print only the first 500 characters to debug\n\n# Run the summarization script with extracted text\nresult = subprocess.run(\n    [\"python3\", \"summarize.py\", file_text], \n    capture_output=True, \n    text=True\n)\n\n# Check for errors\nif result.returncode != 0:\n    print(\"Error:\", result.stderr)\n    raise Exception(\"Summarization script failed!\")\n\n# Output the summary result to n8n\nreturn {\"summary\": result.stdout.strip()}\n\n\n\n\n",
+                "code": "\nimport os\nimport subprocess\n\nfile_path = input_data.get(\"filePath\", \"\")\n\nif not os.path.exists(file_path):\n    raise Exception(f\"Error: File '{file_path}' not found.\")\n\nresult = subprocess.run(\n    [\"python3\", \"summarize.py\", file_path],\n    capture_output=True,\n    text=True\n)\n\nif result.returncode != 0:\n    raise Exception(f\"Summarization failed: {result.stderr}\")\n\nreturn {\"summary\": result.stdout.strip()}\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                540,
+                220
+            ],
+            "id": "48b3878b-cf31-45cc-918e-41e995e2a987",
+            "name": "extract content from file"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "/ask-question",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                80,
+                420
+            ],
+            "id": "24a90439-d5fa-40d9-8e5b-1bfe41f0d0d9",
+            "name": "/ask question",
+            "webhookId": "4e9127bf-bd24-4745-ad33-fe9d958b4058"
+        },
+        {
+            "parameters": {
+                "url": "=\"url\": \"https://hn.algolia.com/api/v1/search?query={{$json[\\\"question\\\"]}}\"",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                320,
+                420
+            ],
+            "id": "0db79fe3-8515-431e-ac34-b2f90bf21213",
+            "name": "search new API",
+            "retryOnFail": true,
+            "waitBetweenTries": 5000
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "ff97608d-1088-40ed-b72a-3101d5a599f7",
+                            "name": "title",
+                            "value": "={{$json[\"hits\"][0][\"title\"]}}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "387d6fe9-9a9b-4b46-8783-6ceee0794891",
+                            "name": "url",
+                            "value": "={{$json[\"hits\"][0][\"url\"]}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                540,
+                420
+            ],
+            "id": "6e58ba13-391b-4c1d-93ef-d054ff0b178f",
+            "name": "set node"
+        },
+        {
+            "parameters": {
+                "mode": "raw",
+                "jsonOutput": "={\n  \"title\": \"{{$json[\"title\"]}}\",\n  \"url\": \"{{$json[\"url\"]}}\"\n}\n",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                760,
+                420
+            ],
+            "id": "77d98084-902c-4a63-bf34-501559099222",
+            "name": "Respond to web Hook"
+        }
+    ],
+    "pinData": {},
+    "connections": {
+        "When clicking \u2018Test workflow\u2019": {
+            "main": [
+                [
+                    {
+                        "node": "fetch ID",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "weavite DB": {
+            "main": [
+                [
+                    {
+                        "node": "insert data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "insert data": {
+            "main": [
+                [
+                    {
+                        "node": "query Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "query Data": {
+            "main": [
+                [
+                    {
+                        "node": "search",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "fetch ID": {
+            "main": [
+                [
+                    {
+                        "node": "fetch URL",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "fetch URL": {
+            "main": [
+                [
+                    {
+                        "node": "weavite DB",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "upload Doc": {
+            "main": [
+                [
+                    {
+                        "node": "Extract from File",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Extract from File": {
+            "main": [
+                [
+                    {
+                        "node": "extract content from file",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "/ask question": {
+            "main": [
+                [
+                    {
+                        "node": "search new API",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "search new API": {
+            "main": [
+                [
+                    {
+                        "node": "set node",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "set node": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to web Hook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Respond to web Hook": {
+            "main": [
+                []
+            ]
+        }
+    },
+    "active": true,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "versionId": "afbeb631-ae44-4e7a-98af-8df1ea7cc350",
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "1f981003df4a536db6bd974f693c734152983b1fb32c775ad0b323efb772b6cc"
+    },
+    "id": "FuhYLWip2MRLQ6Fa",
+    "tags": []
+}
